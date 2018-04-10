@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,uesr-scalable=no">
+	<meta name="format-detection" content="telphone=no,email=no,address=no">
+	<meta http-equiv="X-UA-compatible" content="IE=edge chrome=1">
+	<title>Document</title>
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/reset.css">
+	<style>
+	#wrap{
+		position: relative;
+		width: 100%;
+		height: 200px;
+	}
+	#wrap h1{
+		line-height: 40px;
+		text-align: center;
+		font-size:40px;
+		padding:10px 0;
+	}
+	#box{
+		width: 100%;
+		height: 100%;
+		background: red;
+		color: yellow;
+		text-align: center;
+		line-height: 200px;
+		font-size:30px;
+	}
+	#ggl{
+		position: absolute;
+		left:0;
+		top:60px;
+		background:transparent;
+
+	}
+	</style>
+</head>
+<body>
+	<div id="wrap">
+		<h1>刮刮乐</h1>
+		<div id="box">一等奖</div>
+		<canvas id="ggl"></canvas>
+	</div>
+</body>
+</html>
+<script>
+	var wrap=document.getElementById("wrap");
+	var cvs=wrap.querySelector("#ggl"),
+		ggl=cvs.getContext("2d");
+	size={
+		w:wrap.offsetWidth,
+		h:wrap.offsetHeight
+	};
+	//画布的宽高
+	cvs.width=size.w;
+	cvs.height=size.h;
+	//画遮罩 图案作为填充
+	ggl.fillStyle="#ccc";
+	ggl.fillRect(0,0,size.w,size.h);
+	
+	/*var img=new Image();
+	img.onload=function(){
+		var pat=ggl.createPattern(this,"repeat");
+		ggl.fillStyle=pat;
+		ggl.fillRect(0,0,size.w,size.h);
+	
+
+	}
+	img.src="huang.png";*/
+	//刮得动作
+	cvs.addEventListener("touchstart",function(e){
+		//获取手指在视口中的位置
+		var touches=e.touches[0],
+			start={
+				x:touches.pageX,
+				y:touches.pageY-wrap.offsetTop
+			};
+			ggl.beginPath();
+			ggl.lineWidth=20;
+			ggl.lineCap="round";
+			ggl.lineJoin="round";
+			ggl.globalCompositeOperation="destination-out";
+			ggl.moveTo(start.x,start.y);
+	},false)
+	cvs.addEventListener("touchmove",function(e){
+		var touches=e.touches[0],
+			move={
+				x:touches.pageX,
+				y:touches.pageY-wrap.offsetTop
+			};
+			ggl.lineTo(move.x,move.y);
+			ggl.stroke();
+
+			if(getArea()*100>60){
+				ggl.clearRect(0,0,size.w,size.h)
+			}
+	},false)
+	function getArea(){
+		var img=ggl.getImageData(0,0,300,150),
+			cont=0;
+		img.data.forEach(function(val){
+			if(val==0){
+				cont++;
+			}
+		})
+		return cont/img.data.length;
+	}
+
+</script>
